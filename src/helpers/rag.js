@@ -61,7 +61,7 @@ function rank(query, r1, r2, r3, model = defaultModel) {
             return r.split(' > ').map(s => s.trim().replace('[', '').replace(']', '')).map(s => parseInt(s)).filter(s => !isNaN(s)).reverse()
         })
         .then(ranks => {
-            // TODO check that the list if complete
+            // check that the list if complete
             if (ranks.length != num) {
                 return Promise.reject(`The number of provided passages does not match the number of expected passages. ${ranks.length}!=${num}`)
             }            
@@ -69,9 +69,10 @@ function rank(query, r1, r2, r3, model = defaultModel) {
 
 
             let rankedDocs = []
-            for (let i in ranks) {
-                let doc = docs[ranks[i] - 1]
-                rankedDocs.push({content: doc, rank: i + 1})
+            for (let ri in ranks) {
+                ri = parseInt(ri)
+                let doc = docs[ranks[ri] - 1]
+                rankedDocs.push({...doc, rank: ri})
             }
             return rankedDocs
         })
@@ -86,8 +87,9 @@ function answer_with_docs(query, rankedDocs, model = defaultModel) {
         { role: "assistant", content: `Okay, I an ready to carefully consider the first document and how I can use it to answer your query.` },
     ]
     for (let i in rankedDocs) {
+        i = parseInt(i)
         let d = rankedDocs[i]
-        messages.push({ role: "user", content: `[${i + 1}]Title:  ${d.name}:\n\nContent: ${d.content}\n\nUrl:${d.url}` })
+        messages.push({ role: "user", content: `[${i}]Title:  ${d.name}:\n\nContent: ${d.content}\n\nUrl:${d.url}` })
         messages.push({ role: "assistant", content: `I have considered passage [${parseInt(i) + 1}]. Next please.` })
     }
 

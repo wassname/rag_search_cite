@@ -21,7 +21,7 @@ export default function Editor({ name, value, onChange, rows }) {
       
       <Form.Label htmlFor={name} label={name}><h4>{name}</h4></Form.Label>
         <Form.Control as="textarea" 
-          id={name} rows={rows || 8}
+          id={name} rows={rows || 4}
           type="text"
           value={value}
           placeholder={name}
