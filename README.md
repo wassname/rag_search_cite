@@ -5,9 +5,9 @@ rag_search_cite: Hackable frontend only LLM assisted searching with citations
 
 # demo
 
-~~[demo](https://wassname.github.io/word_level_diff_writing_assistant/)~~
+~~[demo]()~~
 
-~~![screenshot](assets/preview.png)~~
+![screenshot](assets/preview.png)
 
 # run
 
