@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rag_search_cite</title>
+
+  <!-- this is so we can use a localhost openai like api -->
+  <meta
+  http-equiv="Content-Security-Policy"
+  content="*' 'unsafe-inline' 'unsafe-eval';" />
+</head>
+
+<body>
+  <div class="flex min-h-screen flex-col items-center">
+    <div id="root"></div>
+  </div>
+  <footer class="mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8">
+    <div class="border-t border-slate-900/5 py-10 text-center">
+      rag_search_cite: Hackable frontend only LLM assisted searching with citations. Made by <a href="https://wassname.com">wassname</a>.
+      <a href="https://github.com/wassname/rag_search_cite.git">GitHub repo</a>
+
+    </div>
+  </footer>
+  <script type="module" src="/src/main.jsx"></script>
+  
+</body>
+
+</html>
