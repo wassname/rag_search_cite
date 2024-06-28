@@ -5,7 +5,7 @@ rag_search_cite: Hackable frontend only LLM assisted searching with citations
 
 # demo
 
-~~[demo]()~~
+[demo](https://wassname.github.io/rag_search_cite/)
 
 ![screenshot](assets/preview.png)
 
