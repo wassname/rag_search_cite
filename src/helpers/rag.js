@@ -1,6 +1,7 @@
 import sendOpenAIMessage from "./openaiMessage";
 import bingWebSearch from "./bingSearch";
 import { escapeHtml } from "markdown-it/lib/common/utils.mjs";
+import { HTMLarkdown } from 'htmlarkdown'
 
 const defaultModel = 'gpt-3.5-turbo'
 
@@ -79,6 +80,46 @@ function rank(query, r1, r2, r3, model = defaultModel) {
     return r
 }
 
+async function scrape_whole_docs(docs) {
+    // could also use webarchives if needed
+    const htmlarkdown = new HTMLarkdown()
+    let promises = docs.map(async (doc) => {
+        const url = 'https://corsproxy.io/?' + encodeURIComponent(doc.url);
+        // const url = 'https://archive.today/?run=1&url=' + encodeURIComponent(doc.url)
+        // https://webcache.googleusercontent.com/search?q=cache:https%3A%2F%2Fmedium.com%2F%40cybersphere%2Ffetch-api-the-ultimate-guide-to-cors-and-no-cors-cbcef88d371e
+        // https://archive.today/?run=1&url=https%3A%2F%2Fmedium.com%2F%40cybersphere%2Ffetch-api-the-ultimate-guide-to-cors-and-no-cors-cbcef88d371e
+        // https://archive.today/?run=1&url=https%3A%2F%2Fmedium.com%2F%40cybersphere%2Ffetch-api-the-ultimate-guide-to-cors-and-no-cors-cbcef88d371e
+        let md
+
+        // a = fetch(url, { mode: 'no-cors', redirect: 'follow', referrer: '', window: window, headers: { Referer: url } }); a
+        
+        try {
+            let response = await fetch(
+                url, { mode: 'no-cors', redirect: 'follow', referrer: '', window: window }
+            )
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            let body = await response.text()
+
+            md = htmlarkdown.convert(body)
+        } catch (e) {
+            console.log(e)
+            md = null
+        }
+        return {
+            url: url,
+            content: md,
+            source: doc.source + '[web]',
+            name: doc.name,
+            query: doc.query
+        }
+    })
+    return await Promise.all(promises)
+}
+
+
+
 function answer_with_docs(query, rankedDocs, model = defaultModel) {
     let history_summary = ''
     let messages = [
@@ -124,6 +165,16 @@ function search(q, model = defaultModel, setReply, setStatus, setDocs) {
 
     let answer = rankedDocsP.then((rankedDocs) => {
         setDocs(rankedDocs)
+        setStatus({ status: "Scraping" })
+        // Step 4: scrape whole docs, for top 10
+        let top10 = rankedDocs.slice(0, 10)
+        return scrape_whole_docs(top10).then(fullDocs => { 
+            fullDocs = fullDocs.filter(d => d.content != null)
+            return [...fullDocs, ...rankedDocs.slice(0, 50)]
+
+        })
+
+    }).then((rankedDocs) => {
         setStatus({ status: "Answering" })
         return answer_with_docs(q, rankedDocs, model)
     }).catch((err) => {
